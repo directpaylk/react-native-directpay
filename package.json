@@ -1,0 +1,30 @@
+{
+  "name": "react-native-direct-pay-card-payment",
+  "version": "0.0.6",
+  "description": "DirectPay Card Payment Library",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "react-native"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/github_account/react-native-dp-card-payment.git",
+    "baseUrl": "https://github.com/github_account/react-native-dp-card-payment"
+  },
+  "author": {
+    "name": "DirectPay",
+    "email": "hello@directpay.lk"
+  },
+  "license": "",
+  "peerDependencies": {
+    "react-native": "^0.41.2",
+    "react-native-windows": "0.41.0-rc.1"
+  },
+  "devDependencies": {
+    "react-native": "^0.41.2",
+    "react-native-windows": "0.41.0-rc.1"
+  }
+}
