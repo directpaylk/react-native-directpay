@@ -1,6 +1,8 @@
 
 package com.reactlibrary;
 
+import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -20,6 +22,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
+
+import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
@@ -31,7 +36,7 @@ import com.reactlibrary.Models.CardAddCallback;
 
 import org.json.JSONObject;
 
-public class RNDirectPayCardPaymentModule extends ReactContextBaseJavaModule {
+public class RNDirectPayCardPaymentModule extends ReactContextBaseJavaModule  implements ActivityEventListener {
 
   private final ReactApplicationContext reactContext;
   private static final String TAG = "DPSDK";
@@ -73,15 +78,17 @@ public class RNDirectPayCardPaymentModule extends ReactContextBaseJavaModule {
   public void show(String text) {
     final Context context = getReactApplicationContext();
     Toast.makeText(context, text, Toast.LENGTH_LONG).show();
-    UiThreadUtil.runOnUiThread(
-            new Runnable() {
-              public void run(){
-                showCustomDialog(context);}
-            });
+
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || checkDrawOverlayPermission()) {
+        showCustomDialog(context);
+    }
+
   }
 
   private void showCustomDialog(final Context context) {
-
+        UiThreadUtil.runOnUiThread(
+        new Runnable() {
+public void run(){
   //  this.activity = activity;
     ViewGroup viewGroup = getCurrentActivity().findViewById(android.R.id.content);
 
@@ -147,6 +154,9 @@ public class RNDirectPayCardPaymentModule extends ReactContextBaseJavaModule {
 
     alertDialog.show();
     alertDialog.setCancelable(false);
+
+}
+        });
   }
 
   private void progressbar(final boolean show) {
@@ -280,15 +290,42 @@ public class RNDirectPayCardPaymentModule extends ReactContextBaseJavaModule {
     textCardholder.requestFocus();
   }
 
-  private void requestOverlayPermission() {
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-      return;
-    }
+  // code to post/handler request for permission
+  public final static int REQUEST_CODE = 100;
+  @RequiresApi(api = Build.VERSION_CODES.M)
+  public boolean checkDrawOverlayPermission() {
+    Log.v("App", "Package Name: " + reactContext.getPackageName());
 
-    Intent myIntent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
-    myIntent.setData(Uri.parse("package:" + reactContext.getPackageName()));
-    boolean b = reactContext.startActivityForResult(myIntent, 1243,null);
+    // check if we already  have permission to draw over other apps
+    if (!Settings.canDrawOverlays(reactContext)) {
+      Log.v("App", "Requesting Permission" + Settings.canDrawOverlays(reactContext));
+      // if not construct intent to request permission
+      Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+              Uri.parse("package:" + reactContext.getPackageName()));
+    // request permission via start activity for result
+      reactContext.startActivityForResult(intent, REQUEST_CODE,null);
+      return false;
+    } else {
+      return true;
+    }
   }
 
+  @Override
+  public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
+    Log.v("App", "OnActivity Result.");
+    //check if received result code
+    //  is equal our requested code for draw permission
+    if (requestCode == REQUEST_CODE) {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (Settings.canDrawOverlays(reactContext)) {
+          showCustomDialog(reactContext);
+        }
+      }
+    }
+  }
 
+  @Override
+  public void onNewIntent(Intent intent) {
+
+  }
 }
