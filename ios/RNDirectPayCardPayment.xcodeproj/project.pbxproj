@@ -10,6 +10,27 @@
 		B3E7B58A1CC2AC0600A0062D /* RNDirectPayCardPayment.m in Sources */ = {isa = PBXBuildFile; fileRef = B3E7B5891CC2AC0600A0062D /* RNDirectPayCardPayment.m */; };
 		D712DCA0244AD80C00F9734B /* IOSNativeToast.m in Sources */ = {isa = PBXBuildFile; fileRef = D712DC9F244AD80C00F9734B /* IOSNativeToast.m */; };
 		D78D2298244D946A006CBE8C /* RNDirectPayCardPayment.swift in Sources */ = {isa = PBXBuildFile; fileRef = D78D2297244D946A006CBE8C /* RNDirectPayCardPayment.swift */; };
+		D78D22A8244DAE7A006CBE8C /* DPSDK.swift in Sources */ = {isa = PBXBuildFile; fileRef = D78D22A7244DAE7A006CBE8C /* DPSDK.swift */; };
+		D78D22AA244DAEF8006CBE8C /* HttpController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D78D22A9244DAEF8006CBE8C /* HttpController.swift */; };
+		D78D22AC244DAF05006CBE8C /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D78D22AB244DAF05006CBE8C /* Constants.swift */; };
+		D78D22AE244DAF1B006CBE8C /* ThirdPartyUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D78D22AD244DAF1B006CBE8C /* ThirdPartyUser.swift */; };
+		D78D22B0244DAFA5006CBE8C /* HTTPMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = D78D22AF244DAFA5006CBE8C /* HTTPMethod.swift */; };
+		D78D22B2244DB087006CBE8C /* DPDigest.swift in Sources */ = {isa = PBXBuildFile; fileRef = D78D22B1244DB087006CBE8C /* DPDigest.swift */; };
+		D78D22B4244DB096006CBE8C /* SHA256.swift in Sources */ = {isa = PBXBuildFile; fileRef = D78D22B3244DB096006CBE8C /* SHA256.swift */; };
+		D78D22C1244DB0D4006CBE8C /* GatewayError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D78D22B8244DB0D3006CBE8C /* GatewayError.swift */; };
+		D78D22C2244DB0D4006CBE8C /* Gateway.swift in Sources */ = {isa = PBXBuildFile; fileRef = D78D22B9244DB0D3006CBE8C /* Gateway.swift */; };
+		D78D22C3244DB0D4006CBE8C /* Gateway3DSecureViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D78D22BA244DB0D3006CBE8C /* Gateway3DSecureViewController.swift */; };
+		D78D22C4244DB0D4006CBE8C /* Gateway+URLSessionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D78D22BB244DB0D3006CBE8C /* Gateway+URLSessionDelegate.swift */; };
+		D78D22C5244DB0D4006CBE8C /* GatewayRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = D78D22BC244DB0D3006CBE8C /* GatewayRegion.swift */; };
+		D78D22C6244DB0D4006CBE8C /* GatewayMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = D78D22BD244DB0D4006CBE8C /* GatewayMap.swift */; };
+		D78D22C7244DB0D4006CBE8C /* GatewayResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = D78D22BE244DB0D4006CBE8C /* GatewayResult.swift */; };
+		D78D22CB244DB1CD006CBE8C /* BuildConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = D78D22CA244DB1CD006CBE8C /* BuildConfig.swift */; };
+		D78D22CD244DB1E0006CBE8C /* Coding.swift in Sources */ = {isa = PBXBuildFile; fileRef = D78D22CC244DB1E0006CBE8C /* Coding.swift */; };
+		D78D22CF244DB206006CBE8C /* Card.swift in Sources */ = {isa = PBXBuildFile; fileRef = D78D22CE244DB206006CBE8C /* Card.swift */; };
+		D78D22D1244DB20C006CBE8C /* WarningLevel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D78D22D0244DB20C006CBE8C /* WarningLevel.swift */; };
+		D78D22D3244DB7E1006CBE8C /* DPAddCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D78D22D2244DB7E1006CBE8C /* DPAddCardView.swift */; };
+		D78D22D5244DC123006CBE8C /* DPAddCardView.xib in CopyFiles */ = {isa = PBXBuildFile; fileRef = D78D22B5244DB0B3006CBE8C /* DPAddCardView.xib */; };
+		D7C87EEC244DE6D700136D4B /* Media.xcassets in CopyFiles */ = {isa = PBXBuildFile; fileRef = D78D22C9244DB115006CBE8C /* Media.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -78,6 +99,8 @@
 			dstPath = "include/$(PRODUCT_NAME)";
 			dstSubfolderSpec = 16;
 			files = (
+				D7C87EEC244DE6D700136D4B /* Media.xcassets in CopyFiles */,
+				D78D22D5244DC123006CBE8C /* DPAddCardView.xib in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -92,6 +115,27 @@
 		D712DC9F244AD80C00F9734B /* IOSNativeToast.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IOSNativeToast.m; sourceTree = "<group>"; };
 		D78D2292244D911D006CBE8C /* RNDirectPayCardPayment-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RNDirectPayCardPayment-Bridging-Header.h"; sourceTree = "<group>"; };
 		D78D2297244D946A006CBE8C /* RNDirectPayCardPayment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNDirectPayCardPayment.swift; sourceTree = "<group>"; };
+		D78D22A7244DAE7A006CBE8C /* DPSDK.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DPSDK.swift; sourceTree = "<group>"; };
+		D78D22A9244DAEF8006CBE8C /* HttpController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HttpController.swift; sourceTree = "<group>"; };
+		D78D22AB244DAF05006CBE8C /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		D78D22AD244DAF1B006CBE8C /* ThirdPartyUser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThirdPartyUser.swift; sourceTree = "<group>"; };
+		D78D22AF244DAFA5006CBE8C /* HTTPMethod.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HTTPMethod.swift; sourceTree = "<group>"; };
+		D78D22B1244DB087006CBE8C /* DPDigest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DPDigest.swift; sourceTree = "<group>"; };
+		D78D22B3244DB096006CBE8C /* SHA256.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SHA256.swift; sourceTree = "<group>"; };
+		D78D22B5244DB0B3006CBE8C /* DPAddCardView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DPAddCardView.xib; sourceTree = "<group>"; };
+		D78D22B8244DB0D3006CBE8C /* GatewayError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GatewayError.swift; sourceTree = "<group>"; };
+		D78D22B9244DB0D3006CBE8C /* Gateway.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Gateway.swift; sourceTree = "<group>"; };
+		D78D22BA244DB0D3006CBE8C /* Gateway3DSecureViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Gateway3DSecureViewController.swift; sourceTree = "<group>"; };
+		D78D22BB244DB0D3006CBE8C /* Gateway+URLSessionDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Gateway+URLSessionDelegate.swift"; sourceTree = "<group>"; };
+		D78D22BC244DB0D3006CBE8C /* GatewayRegion.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GatewayRegion.swift; sourceTree = "<group>"; };
+		D78D22BD244DB0D4006CBE8C /* GatewayMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GatewayMap.swift; sourceTree = "<group>"; };
+		D78D22BE244DB0D4006CBE8C /* GatewayResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GatewayResult.swift; sourceTree = "<group>"; };
+		D78D22C9244DB115006CBE8C /* Media.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Media.xcassets; sourceTree = "<group>"; };
+		D78D22CA244DB1CD006CBE8C /* BuildConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BuildConfig.swift; sourceTree = "<group>"; };
+		D78D22CC244DB1E0006CBE8C /* Coding.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Coding.swift; sourceTree = "<group>"; };
+		D78D22CE244DB206006CBE8C /* Card.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Card.swift; sourceTree = "<group>"; };
+		D78D22D0244DB20C006CBE8C /* WarningLevel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WarningLevel.swift; sourceTree = "<group>"; };
+		D78D22D2244DB7E1006CBE8C /* DPAddCardView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DPAddCardView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -117,7 +161,28 @@
 			isa = PBXGroup;
 			children = (
 				D78D2297244D946A006CBE8C /* RNDirectPayCardPayment.swift */,
+				D78D22A7244DAE7A006CBE8C /* DPSDK.swift */,
+				D78D22CA244DB1CD006CBE8C /* BuildConfig.swift */,
 				D712DC9E244AD80C00F9734B /* IOSNativeToast.h */,
+				D78D22CC244DB1E0006CBE8C /* Coding.swift */,
+				D78D22A9244DAEF8006CBE8C /* HttpController.swift */,
+				D78D22AD244DAF1B006CBE8C /* ThirdPartyUser.swift */,
+				D78D22C9244DB115006CBE8C /* Media.xcassets */,
+				D78D22B5244DB0B3006CBE8C /* DPAddCardView.xib */,
+				D78D22D0244DB20C006CBE8C /* WarningLevel.swift */,
+				D78D22CE244DB206006CBE8C /* Card.swift */,
+				D78D22D2244DB7E1006CBE8C /* DPAddCardView.swift */,
+				D78D22B9244DB0D3006CBE8C /* Gateway.swift */,
+				D78D22BB244DB0D3006CBE8C /* Gateway+URLSessionDelegate.swift */,
+				D78D22BA244DB0D3006CBE8C /* Gateway3DSecureViewController.swift */,
+				D78D22B8244DB0D3006CBE8C /* GatewayError.swift */,
+				D78D22BD244DB0D4006CBE8C /* GatewayMap.swift */,
+				D78D22BC244DB0D3006CBE8C /* GatewayRegion.swift */,
+				D78D22BE244DB0D4006CBE8C /* GatewayResult.swift */,
+				D78D22AF244DAFA5006CBE8C /* HTTPMethod.swift */,
+				D78D22B3244DB096006CBE8C /* SHA256.swift */,
+				D78D22B1244DB087006CBE8C /* DPDigest.swift */,
+				D78D22AB244DAF05006CBE8C /* Constants.swift */,
 				D712DC9F244AD80C00F9734B /* IOSNativeToast.m */,
 				B3E7B5881CC2AC0600A0062D /* RNDirectPayCardPayment.h */,
 				B3E7B5891CC2AC0600A0062D /* RNDirectPayCardPayment.m */,
@@ -273,9 +338,28 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D78D22D3244DB7E1006CBE8C /* DPAddCardView.swift in Sources */,
+				D78D22C3244DB0D4006CBE8C /* Gateway3DSecureViewController.swift in Sources */,
+				D78D22A8244DAE7A006CBE8C /* DPSDK.swift in Sources */,
+				D78D22AA244DAEF8006CBE8C /* HttpController.swift in Sources */,
+				D78D22CD244DB1E0006CBE8C /* Coding.swift in Sources */,
+				D78D22C5244DB0D4006CBE8C /* GatewayRegion.swift in Sources */,
+				D78D22C6244DB0D4006CBE8C /* GatewayMap.swift in Sources */,
+				D78D22CB244DB1CD006CBE8C /* BuildConfig.swift in Sources */,
 				D78D2298244D946A006CBE8C /* RNDirectPayCardPayment.swift in Sources */,
+				D78D22C2244DB0D4006CBE8C /* Gateway.swift in Sources */,
 				D712DCA0244AD80C00F9734B /* IOSNativeToast.m in Sources */,
+				D78D22C1244DB0D4006CBE8C /* GatewayError.swift in Sources */,
+				D78D22D1244DB20C006CBE8C /* WarningLevel.swift in Sources */,
+				D78D22B2244DB087006CBE8C /* DPDigest.swift in Sources */,
+				D78D22C4244DB0D4006CBE8C /* Gateway+URLSessionDelegate.swift in Sources */,
+				D78D22B0244DAFA5006CBE8C /* HTTPMethod.swift in Sources */,
+				D78D22C7244DB0D4006CBE8C /* GatewayResult.swift in Sources */,
+				D78D22CF244DB206006CBE8C /* Card.swift in Sources */,
+				D78D22B4244DB096006CBE8C /* SHA256.swift in Sources */,
+				D78D22AE244DAF1B006CBE8C /* ThirdPartyUser.swift in Sources */,
 				B3E7B58A1CC2AC0600A0062D /* RNDirectPayCardPayment.m in Sources */,
+				D78D22AC244DAF05006CBE8C /* Constants.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -328,7 +412,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -374,7 +458,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
@@ -385,6 +469,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
@@ -406,6 +494,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
