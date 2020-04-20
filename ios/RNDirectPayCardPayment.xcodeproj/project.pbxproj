@@ -29,8 +29,8 @@
 		D78D22CF244DB206006CBE8C /* Card.swift in Sources */ = {isa = PBXBuildFile; fileRef = D78D22CE244DB206006CBE8C /* Card.swift */; };
 		D78D22D1244DB20C006CBE8C /* WarningLevel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D78D22D0244DB20C006CBE8C /* WarningLevel.swift */; };
 		D78D22D3244DB7E1006CBE8C /* DPAddCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D78D22D2244DB7E1006CBE8C /* DPAddCardView.swift */; };
-		D78D22D5244DC123006CBE8C /* DPAddCardView.xib in CopyFiles */ = {isa = PBXBuildFile; fileRef = D78D22B5244DB0B3006CBE8C /* DPAddCardView.xib */; };
-		D7C87EEC244DE6D700136D4B /* Media.xcassets in CopyFiles */ = {isa = PBXBuildFile; fileRef = D78D22C9244DB115006CBE8C /* Media.xcassets */; };
+		D7C87EF0244DEC8400136D4B /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D78D22C9244DB115006CBE8C /* Media.xcassets */; };
+		D7C87EF1244DEC8400136D4B /* DPAddCardView.xib in Resources */ = {isa = PBXBuildFile; fileRef = D78D22B5244DB0B3006CBE8C /* DPAddCardView.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -97,10 +97,8 @@
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "include/$(PRODUCT_NAME)";
-			dstSubfolderSpec = 16;
+			dstSubfolderSpec = 7;
 			files = (
-				D7C87EEC244DE6D700136D4B /* Media.xcassets in CopyFiles */,
-				D78D22D5244DC123006CBE8C /* DPAddCardView.xib in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -225,6 +223,7 @@
 				58B511D71A9E6C8500147676 /* Sources */,
 				58B511D81A9E6C8500147676 /* Frameworks */,
 				58B511D91A9E6C8500147676 /* CopyFiles */,
+				D7C87EEF244DEC7600136D4B /* Resources */,
 			);
 			buildRules = (
 			);
@@ -332,6 +331,18 @@
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
+
+/* Begin PBXResourcesBuildPhase section */
+		D7C87EEF244DEC7600136D4B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D7C87EF0244DEC8400136D4B /* Media.xcassets in Resources */,
+				D7C87EF1244DEC8400136D4B /* DPAddCardView.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		58B511D71A9E6C8500147676 /* Sources */ = {
