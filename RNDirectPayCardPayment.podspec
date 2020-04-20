@@ -10,7 +10,7 @@ Pod::Spec.new do |s|
   s.author             = { "author" => "author@domain.cn" }
   s.platform     = :ios, "7.0"
   s.source       = { :git => "https://github.com/AselaD/react-native-directpay.git", :tag => "master" }
-  s.source_files  = "**/*.{h,m}"
+  s.source_files  = "**/*.{h,m,swift}"
   s.requires_arc = true
 
 
