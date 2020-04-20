@@ -1,11 +1,10 @@
-
 #import "RNDirectPayCardPayment.h"
-
 #import "IOSNativeToast.h"
 
 @interface RNDirectPayCardPayment()
 
 @property (nonatomic, retain) IOSNativeToast *toast;
+
 @end
 
 @implementation RNDirectPayCardPayment
@@ -27,13 +26,12 @@
 {
     return dispatch_get_main_queue();
 }
+RCT_EXPORT_MODULE();
 
 RCT_EXPORT_METHOD(show:(NSString *)text)
 {
     [self.toast showToast:text];
 }
-
-RCT_EXPORT_MODULE()
 
 @end
   

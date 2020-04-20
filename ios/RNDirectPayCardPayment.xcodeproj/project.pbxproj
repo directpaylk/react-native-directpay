@@ -8,8 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		B3E7B58A1CC2AC0600A0062D /* RNDirectPayCardPayment.m in Sources */ = {isa = PBXBuildFile; fileRef = B3E7B5891CC2AC0600A0062D /* RNDirectPayCardPayment.m */; };
-		D712DC87244AC0FC00F9734B /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D712DC78244AC0F300F9734B /* libReact.a */; };
-		D712DC8A244AC2C900F9734B /* IOSNativeToast.m in Sources */ = {isa = PBXBuildFile; fileRef = D712DC88244AC2C900F9734B /* IOSNativeToast.m */; };
+		D712DCA0244AD80C00F9734B /* IOSNativeToast.m in Sources */ = {isa = PBXBuildFile; fileRef = D712DC9F244AD80C00F9734B /* IOSNativeToast.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -88,8 +87,8 @@
 		B3E7B5881CC2AC0600A0062D /* RNDirectPayCardPayment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNDirectPayCardPayment.h; sourceTree = "<group>"; };
 		B3E7B5891CC2AC0600A0062D /* RNDirectPayCardPayment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNDirectPayCardPayment.m; sourceTree = "<group>"; };
 		D712DC6C244AC0F200F9734B /* React.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = React.xcodeproj; path = "../node_modules/react-native/React/React.xcodeproj"; sourceTree = "<group>"; };
-		D712DC88244AC2C900F9734B /* IOSNativeToast.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = IOSNativeToast.m; path = "../../../Downloads/RNNativeLibrary-IOSToastFiles/IOSNativeToast.m"; sourceTree = "<group>"; };
-		D712DC89244AC2C900F9734B /* IOSNativeToast.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IOSNativeToast.h; path = "../../../Downloads/RNNativeLibrary-IOSToastFiles/IOSNativeToast.h"; sourceTree = "<group>"; };
+		D712DC9E244AD80C00F9734B /* IOSNativeToast.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IOSNativeToast.h; sourceTree = "<group>"; };
+		D712DC9F244AD80C00F9734B /* IOSNativeToast.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IOSNativeToast.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -97,7 +96,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D712DC87244AC0FC00F9734B /* libReact.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -115,8 +113,8 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
-				D712DC89244AC2C900F9734B /* IOSNativeToast.h */,
-				D712DC88244AC2C900F9734B /* IOSNativeToast.m */,
+				D712DC9E244AD80C00F9734B /* IOSNativeToast.h */,
+				D712DC9F244AD80C00F9734B /* IOSNativeToast.m */,
 				B3E7B5881CC2AC0600A0062D /* RNDirectPayCardPayment.h */,
 				B3E7B5891CC2AC0600A0062D /* RNDirectPayCardPayment.m */,
 				134814211AA4EA7D00B7C361 /* Products */,
@@ -269,7 +267,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D712DC8A244AC2C900F9734B /* IOSNativeToast.m in Sources */,
+				D712DCA0244AD80C00F9734B /* IOSNativeToast.m in Sources */,
 				B3E7B58A1CC2AC0600A0062D /* RNDirectPayCardPayment.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
