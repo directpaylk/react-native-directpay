@@ -61,11 +61,11 @@ internal class DPAddCardView: UIView, UITextFieldDelegate {
     }
     
     override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
-//        print("performing action: \(action), \(sender)")
+        //        print("performing action: \(action), \(sender)")
         
-//        if(action == "_share:"){
-//            return false
-//        }
+        //        if(action == "_share:"){
+        //            return false
+        //        }
         
         return super.canPerformAction(action, withSender: sender)
     }
@@ -286,9 +286,9 @@ internal class DPAddCardView: UIView, UITextFieldDelegate {
         
         let year:Int = Int("20" + textYear.text!)!
         let currentYear = Calendar.current.component(.year, from: Date())
-
+        
         if(year < currentYear){
-//            self.showWarning(component:textYear, warning: "This card is expired!")
+            //            self.showWarning(component:textYear, warning: "This card is expired!")
             self.showWarning(component:textMonth, warning: "This card is expired!")
             return false
         }
@@ -346,7 +346,28 @@ internal class DPAddCardView: UIView, UITextFieldDelegate {
     }
     
     private func setupView(){
-        let bundle = Bundle(for: type(of: self))
+        
+        //        if let bundlePath = Bundle.main.path(forResource: "Resources", ofType: "bundle"),
+        //            let bundle = Bundle(path: bundlePath),
+        //            let path = bundle.path(forResource: "DPAddCardView", ofType: ".cib") {
+        //            print(path)
+        
+        let myBundle = Bundle(for: type(of: self))
+        
+        // Get the URL to the resource bundle within the bundle
+        // of the current class.
+        guard let resourceBundleURL = myBundle.url(
+            forResource: "Resources", withExtension: "bundle")
+            else { fatalError("Resources not found!") }
+        
+        // Create a bundle object for the bundle found at that URL.
+        guard let bundle = Bundle(url: resourceBundleURL)
+            else { fatalError("Cannot access Resources!") }
+        
+        
+        
+        
+        // let bundle = Bundle(for: type(of: self))
         let nib = UINib(nibName: self.nibName, bundle: bundle)
         self.contentView = nib.instantiate(withOwner: self, options: nil).first as? UIView
         addSubview(contentView)
@@ -354,7 +375,7 @@ internal class DPAddCardView: UIView, UITextFieldDelegate {
         contentView.center = self.center
         contentView.autoresizingMask = []
         contentView.translatesAutoresizingMaskIntoConstraints = true
-//        contentView.layer.cornerRadius = 5
+        //        contentView.layer.cornerRadius = 5
         contentView.layer.borderWidth = 2
         contentView.layer.borderColor = UIColor(red:0.00, green:0.13, blue:0.48, alpha:1.0).cgColor
         
@@ -382,6 +403,11 @@ internal class DPAddCardView: UIView, UITextFieldDelegate {
         
         self.contentView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.dismissKeyboard)))
         self.removeSpinner()
+        
+        //        } else {
+        //            print("not found")
+        //
+        //        }
     }
 }
 
@@ -408,7 +434,7 @@ extension UIView{
                         vSpinner?.backgroundColor = UIColor(red:0.37, green:0.37, blue:0.37, alpha:1.0)
                         break
                     }
-                
+                    
                 }, completion: { (completed:Bool) in
                     let bounds:CGRect = (vSpinner?.bounds)!
                     
@@ -445,7 +471,7 @@ extension UIView{
         if(vSpinner != nil){
             DispatchQueue.main.async {
                 vSpinner?.endEditing(true)
-
+                
                 UIView.animate(withDuration: 0.20, animations: {
                     vSpinner?.backgroundColor = UIColor(red:0.37, green:0.70, blue:0.26, alpha:1.0)
                 }, completion: { (completed:Bool) in
@@ -466,7 +492,7 @@ extension UIView{
                     labelMessage.font = UIFont(name: "System Bold", size: 15)
                     
                     let imageSuccess:UIImageView = UIImageView(image: UIImage(named: "success"))
-//                    imageSuccess.contentMode = .scaleAspectFit
+                    //                    imageSuccess.contentMode = .scaleAspectFit
                     imageSuccess.frame = CGRect(x: 0, y: 0, width: 150, height: 150)
                     
                     for view:UIView in (vSpinner?.subviews)! {
@@ -474,7 +500,7 @@ extension UIView{
                     }
                     vSpinner?.addSubview(buttonDone)
                     vSpinner?.addSubview(labelMessage)
-//                    vSpinner?.addSubview(imageSuccess)
+                    //                    vSpinner?.addSubview(imageSuccess)
                 })
             }
         }
