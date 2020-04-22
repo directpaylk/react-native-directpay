@@ -2,6 +2,13 @@ package com.reactlibrary.Controllers;
 
 public class Constants {
 
+    public static String ENV = "dev";
+
+    public static boolean debug = false;
+
+    public static String DEV = "dev";
+    public static String PROD = "prod";
+
     public static String API_KEY;
     public static String MERCHANT_ID;
     public static String API_VERSION;
@@ -13,7 +20,9 @@ public class Constants {
         SERVICE_UNAVAILABLE(570, "SERVICE_UNAVAILABLE"),
         INTERNAL_ERROR(571, "INTERNAL_ERROR"),
         USER_ACTION_CLOSED(600, "USER_ACTION_CLOSED"),
-        TOO_LARGE_RETRY_ATTEMPTS(601, "TOO_LARGE_RETRY_ATTEMPTS");
+        TOO_LARGE_RETRY_ATTEMPTS(601, "TOO_LARGE_RETRY_ATTEMPTS"),
+        AUTHENTICATION_FAILED(602, "3DS_AUTHENTICATION_FAILED"),
+        CARD_NOT_ENROLLED_EXCEPTION(603, "Card Not Enrolled Exception");
 
         public int CODE;
         public String MESSAGE;
@@ -24,10 +33,22 @@ public class Constants {
         }
     }
 
-    private static String API = "https://dev.directpay.lk/v1/mpg/api";
+    public enum RESPONSES {
+        AUTHENTICATION_SUCCESSFUL ("AUTHENTICATION_SUCCESSFUL");
+
+        public String CODE;
+
+        private RESPONSES(String response){
+            this.CODE = response;
+        }
+    }
+
+    public static String DEV_URL = "https://dev.directpay.lk/v1/mpg/api";
+    public static String PROD_URL = "https://prod.directpay.lk/v1/mpg/api";
+    public static String API;
 
     public enum ROUTES {
-        GET_SESSION("/sdk/session"), ADD_CARD("/sdk/cardAdd"), LIST_CARD("/sdk/cardList"), REMOVE_CARD("/sdk/cardDelete"), PAY_CARD("/sdk/cardPay");
+        GET_SESSION("/sdk/session"), ADD_CARD("/sdk/cardAdd"), LIST_CARD("/sdk/cardList"), REMOVE_CARD("/sdk/cardDelete"), PAY_CARD("/sdk/cardPay"),CHECK_3DS("/sdk/check3ds");
         public String URL;
 
         private ROUTES(String namespace) {

@@ -6,6 +6,7 @@
     android:orientation="vertical">
 
     <LinearLayout
+        android:id="@+id/layoutCardDetails"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -20,33 +21,19 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Headline"
             android:textSize="18sp" />
 
-        <LinearLayout
+        <EditText
+            android:id="@+id/textCardholderName"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
-            <EditText
-                android:layout_weight="1"
-                android:id="@+id/textCardholderName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:hint="Cardholder name"
-                android:inputType="textPersonName"
-                android:nextFocusForward="@id/textNickname" />
-
-            <EditText
-                android:id="@+id/textNickname"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:hint="Nickname (Optional)"
-                android:inputType="textPersonName"
-                android:nextFocusForward="@id/textCardNumber" />
-        </LinearLayout>
+            android:layout_height="wrap_content"
+            android:hint="Cardholder Name"
+            android:inputType="textPersonName"
+            android:nextFocusForward="@id/textCardNumber" />
 
         <EditText
             android:id="@+id/textCardNumber"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Card number"
+            android:hint="Credit Card Number"
             android:inputType="numberSigned"
             android:maxLength="19"
             android:nextFocusForward="@id/textMonth" />
@@ -128,14 +115,11 @@
         </ProgressBar>
 
         <LinearLayout
-            android:layout_gravity="bottom"
-            android:gravity="bottom"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
             <Button
-                android:gravity="bottom|start"
                 android:id="@+id/buttonClose"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -152,7 +136,6 @@
                 android:textColor="@android:color/holo_red_dark" />
 
             <Button
-                android:gravity="bottom|end"
                 android:id="@+id/buttonOk"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -166,11 +149,18 @@
                 android:background="@drawable/button_background"
                 android:text="Add Card"
                 android:textAlignment="textEnd"
-                android:textColor="@color/colorPrimary"
+                android:textColor="@color/dpPrimary"
                 android:textStyle="bold" />
         </LinearLayout>
 
     </LinearLayout>
+    
+    <WebView
+        android:visibility="gone"
+        android:layout_margin="8dp"
+        android:id="@+id/webview3ds"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
     <RelativeLayout
         android:layout_width="match_parent"

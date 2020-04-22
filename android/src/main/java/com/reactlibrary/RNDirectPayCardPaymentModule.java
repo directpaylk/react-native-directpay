@@ -10,13 +10,18 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.webkit.WebChromeClient;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,10 +44,13 @@ import com.reactlibrary.Models.ThirdPartyUser;
 
 import org.json.JSONObject;
 
+import java.util.Set;
+
 public class RNDirectPayCardPaymentModule extends ReactContextBaseJavaModule implements ActivityEventListener {
 
   private final ReactApplicationContext reactContext;
   private static final String TAG = "DPSDK";
+  static final String REDIRECT_SCHEME = "gatewaysdk";
   private final Gateway gateway;
 
   private CardAddCallback addCallback;
@@ -52,7 +60,9 @@ public class RNDirectPayCardPaymentModule extends ReactContextBaseJavaModule imp
   private String currency;
 
 //  private HttpController http;
-  private EditText textCardholder, textNickname, textCardnumber, textMonth, textYear, textCVV;
+  private EditText textCardholder, textCardnumber, textMonth, textYear, textCVV;
+  private WebView webView;
+
   private Button buttonClose, buttonAdd;
   private ProgressBar progressbar;
 //  private Activity activity;
@@ -60,6 +70,8 @@ public class RNDirectPayCardPaymentModule extends ReactContextBaseJavaModule imp
   private String nickname;
 
   private HttpController http;
+
+  private LinearLayout layoutCardDetails;
 
   public RNDirectPayCardPaymentModule(ReactApplicationContext reactContext) {
     super(reactContext);
@@ -130,6 +142,117 @@ public class RNDirectPayCardPaymentModule extends ReactContextBaseJavaModule imp
 
   }
 
+
+  private WebViewClient buildWebViewClient(AlertDialog dialog, CardAddCallback callback) {
+    return new WebViewClient() {
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            if (Constants.debug) {
+                Log.d(TAG, "shouldOverrideUrlLoading() called with: view = [" + view + "], url = [" + url + "]");
+            }
+            webViewUrlChanges(Uri.parse(url), dialog, callback);
+            return true;
+        }
+    };
+}
+
+private void webViewUrlChanges(Uri uri, AlertDialog dialog, CardAddCallback callback) {
+    String scheme = uri.getScheme();
+    if (Constants.debug) {
+        Log.i(TAG, "webViewUrlChanges: " + scheme);
+    }
+    if (REDIRECT_SCHEME.equalsIgnoreCase(scheme)) {
+        complete(getACSResultFromUri(uri), dialog, callback);
+    } else if ("mailto".equalsIgnoreCase(scheme)) {
+        intentToEmail(uri);
+    } else {
+        loadWebViewUrl(uri);
+    }
+}
+
+private void complete(String acsResult, AlertDialog dialog, CardAddCallback callback) {
+    webView.setVisibility(View.GONE);
+    layoutCardDetails.setVisibility(View.VISIBLE);
+
+    if (Constants.debug) {
+        Log.d(TAG, "complete() called with: acsResult = [" + acsResult + "]");
+    }
+
+    try {
+        JSONObject responseObj = new JSONObject(acsResult);
+        JSONObject response = responseObj.getJSONObject("response");
+
+        JSONObject secure3d = response.getJSONObject("3DSecure");
+        String gatewayCode = secure3d.getString("gatewayCode");
+
+        if (gatewayCode.equals(Constants.RESPONSES.AUTHENTICATION_SUCCESSFUL.CODE)) {
+            addCard(dialog, callback);
+        } else {
+            progressbar(false);
+            Constants.ERRORS authFailed = Constants.ERRORS.AUTHENTICATION_FAILED;
+            warningMessage(gatewayCode, true);
+        }
+    } catch (Exception ex) {
+        if (Constants.debug) {
+            ex.printStackTrace();
+        }
+    }
+}
+
+private void loadWebViewUrl(Uri uri) {
+    webView.loadUrl(uri.toString());
+}
+
+private void intentToEmail(Uri uri) {
+    Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
+    intentToEmail(uri, emailIntent);
+}
+
+// separate for testability
+private void intentToEmail(Uri uri, Intent intent) {
+    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+    intent.setData(uri);
+
+    reactContext.startActivity(intent);
+}
+
+private String getACSResultFromUri(Uri uri) {
+    String result = null;
+
+    Set<String> params = uri.getQueryParameterNames();
+    for (String param : params) {
+        if ("acsResult".equalsIgnoreCase(param)) {
+            result = uri.getQueryParameter(param);
+        }
+    }
+
+    return result;
+}
+
+private int getNavigationBarHeight() {
+  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+      DisplayMetrics metrics = new DisplayMetrics();
+      getCurrentActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+      int usableHeight = metrics.heightPixels;
+      getCurrentActivity().getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
+      int realHeight = metrics.heightPixels;
+      if (realHeight > usableHeight)
+          return realHeight - usableHeight;
+      else
+          return 0;
+  }
+  return 0;
+}
+
+private DisplayMetrics displayMetrics = new DisplayMetrics();
+
+private int getScreenHeight() {
+    getCurrentActivity().getWindowManager()
+          .getDefaultDisplay()
+          .getMetrics(displayMetrics);
+  return displayMetrics.heightPixels + getNavigationBarHeight();
+}
+
   private void showCustomDialog(final Context context, final CardAddCallback callback) {
         UiThreadUtil.runOnUiThread(
         new Runnable() {
@@ -143,11 +266,22 @@ public void run(){
     progressbar = dialogView.findViewById(R.id.progressbar);
 
     textCardholder = dialogView.findViewById(R.id.textCardholderName);
-    textNickname = dialogView.findViewById(R.id.textNickname);
     textCardnumber = dialogView.findViewById(R.id.textCardNumber);
     textMonth = dialogView.findViewById(R.id.textMonth);
     textYear = dialogView.findViewById(R.id.textYear);
     textCVV = dialogView.findViewById(R.id.textCVV);
+
+    webView = dialogView.findViewById(R.id.webview3ds);
+        webView.setWebChromeClient(new WebChromeClient());
+        webView.getSettings().setDomStorageEnabled(true);
+        webView.getSettings().setJavaScriptEnabled(true);
+
+        ViewGroup.LayoutParams webviewLayoutParams = webView.getLayoutParams();
+        webviewLayoutParams.height = (int) (getScreenHeight() * 0.9);
+        webView.setLayoutParams(webviewLayoutParams);
+
+        layoutCardDetails = dialogView.findViewById(R.id.layoutCardDetails);
+
 
     labelWarning = dialogView.findViewById(R.id.textWarning);
 
@@ -207,7 +341,7 @@ public void run(){
     buttonClose.setEnabled(enabled);
 
     textCardholder.setEnabled(enabled);
-    textNickname.setEnabled(enabled);
+
     textCardnumber.setEnabled(enabled);
     textYear.setEnabled(enabled);
     textMonth.setEnabled(enabled);
@@ -262,7 +396,7 @@ public void run(){
   }
 
   private void getSession(final AlertDialog dialog, final CardAddCallback callback) {
-    nickname = textNickname.getText().toString();
+
 
     final String cardholder = textCardholder.getText().toString();
     final String cardNumber = textCardnumber.getText().toString();
@@ -284,33 +418,39 @@ public void run(){
           Log.i(TAG, "success: SESSION_ID:" + sessionId);
 
           //retrieve mid from response
-          gateway.setMerchantId(data.getJSONObject("merchant").getString("gid"));
+          JSONObject merchant = data.getJSONObject("merchant");
+                    String gatewayId = merchant.getString("gid");
+                    boolean isEnable3ds = merchant.getBoolean("isEnable3ds");
+
+                    gateway.setMerchantId(gatewayId);
 
 
           progressbar(false);
-          updateSession(dialog, sessionId, cardholder, cardNumber, year, month, cvv, callback);
+          updateSession(dialog, sessionId, cardholder, cardNumber, year, month, cvv,isEnable3ds ,callback);
         } catch (Exception ignored) {
         }
       }
 
       @Override
       public void error(int code, String message) {
+        if (Constants.debug)
         Log.d(TAG, "error() called with: code = [" + code + "], message = [" + message + "]");
         progressbar(false);
-        callback.onError(Constants.ERRORS.SERVICE_UNAVAILABLE.CODE, Constants.ERRORS.SERVICE_UNAVAILABLE.MESSAGE);
+        warningMessage(message, true);
       }
     });
   }
 
   private void resetFields() {
+
     textCardholder.setText(null);
-    textNickname.setText(null);
     textCardnumber.setText(null);
     textYear.setText(null);
     textMonth.setText(null);
     textCVV.setText(null);
     hideWarnings();
     System.gc();
+
   }
 
   private void hideWarnings() {
@@ -367,7 +507,7 @@ public void run(){
 
   }
 
-  private void updateSession(final AlertDialog dialog, String sessionId, String cardHolder, String cardNumber, String year, String month, String cvv, final CardAddCallback callback) {
+  private void updateSession(final AlertDialog dialog, String sessionId, String cardHolder, String cardNumber, String year, String month, String cvv,boolean is3dsEnabled, final CardAddCallback callback) {
     try {
       GatewayMap request = new GatewayMap()
               .set("sourceOfFunds.provided.card.nameOnCard", cardHolder)
@@ -376,17 +516,24 @@ public void run(){
               .set("sourceOfFunds.provided.card.expiry.month", month)
               .set("sourceOfFunds.provided.card.expiry.year", year);
 
-      Log.i(TAG, "updateSession: called, session_id: " + sessionId + ", api_version: " + Constants.API_VERSION);
+              if (Constants.debug)
+              Log.i(TAG, "updateSession: called, session_id: " + sessionId + ", api_version: " + Constants.API_VERSION);
 
       gateway.updateSession(sessionId, Constants.API_VERSION, request, new GatewayCallback() {
         @Override
         public void onSuccess(GatewayMap response) {
+          if (Constants.debug)
           Log.d(TAG, "onSuccess() called with: response = [" + response + "]");
+      if (is3dsEnabled) {
+          check3ds(sessionId, dialog, callback);
+      } else {
           addCard(dialog, callback);
+      }
         }
 
         @Override
         public void onError(Throwable throwable) {
+          if (Constants.debug)
           Log.d(TAG, "onError() called with: throwable = [" + throwable + "]");
           progressbar(false);
           warningMessage(throwable.getMessage(), true);
@@ -398,6 +545,51 @@ public void run(){
       System.gc();
     }
   }
+
+  private void setWebViewHtml(String html) {
+    webView.loadData(html, "text/html", "utf-8");
+}
+
+private void check3ds(String sessionId, AlertDialog dialog, CardAddCallback callback) {
+    JSONObject parameters = new JSONObject();
+    try {
+        parameters.put("merchantId", Constants.MERCHANT_ID);
+        parameters.put("_sessionId", sessionId);
+        parameters.put("amount", 5);
+    } catch (Exception ex) {
+    }
+
+    http.post(getCurrentActivity(), Constants.ROUTES.CHECK_3DS.URL, parameters, new HttpCallback() {
+        @Override
+        public void success(JSONObject data) {
+            if (Constants.debug) Log.d(TAG, "success() called with: data = [" + data + "]");
+            try {
+                String html = data.getString("html");
+                String secureId = data.getString("3DSecureId");
+                setWebViewHtml(html);
+                webView.setWebViewClient(buildWebViewClient(dialog, callback));
+
+                layoutCardDetails.setVisibility(View.GONE);
+                webView.setVisibility(View.VISIBLE);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        @Override
+        public void error(int code, String message) {
+            if(code == Constants.ERRORS.CARD_NOT_ENROLLED_EXCEPTION.CODE){
+                addCard(dialog, callback);
+            }else{
+                if (Constants.debug)
+                    Log.d(TAG, "error() called with: code = [" + code + "], message = [" + message + "]");
+                progressbar(false);
+                warningMessage(message, true);
+            }
+        }
+    });
+}
+
 
   private void addCard(final AlertDialog dialog, final CardAddCallback callback) {
     JSONObject parameters = new JSONObject();
@@ -414,7 +606,7 @@ public void run(){
     http.post(getCurrentActivity(), Constants.ROUTES.ADD_CARD.URL, parameters, new HttpCallback() {
       @Override
       public void success(JSONObject data) {
-        Log.d(TAG, "success() called with: data = [" + data + "]");
+        if (Constants.debug) Log.d(TAG, "success() called with: data = [" + data + "]");
         progressbar(false);
 
         Card card = new Card();
@@ -443,7 +635,9 @@ public void run(){
 
       @Override
       public void error(int code, String message) {
-        Log.d(TAG, "error() called with: code = [" + code + "], message = [" + message + "]");
+        if (Constants.debug)
+                    Log.d(TAG, "error() called with: code = [" + code + "], message = [" + message + "]");
+              
         progressbar(false);
         Constants.ERRORS cannotProcess = Constants.ERRORS.CANNOT_PROCESS;
         warningMessage(message, true);
