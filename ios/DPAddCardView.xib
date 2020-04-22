@@ -136,7 +136,7 @@
                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             </view>
             <blurEffect style="light"/>
-            <point key="canvasLocation" x="65.599999999999994" y="151.12443778110946"/>
+            <point key="canvasLocation" x="60.799999999999997" y="141.22938530734635"/>
         </visualEffectView>
     </objects>
     <resources>

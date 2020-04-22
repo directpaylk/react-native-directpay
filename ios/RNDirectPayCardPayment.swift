@@ -19,12 +19,12 @@ class RNDirectPayCardPayment: NSObject {
     
     private var count = 0
     @objc
-    func addCardToUser(_ callback: @escaping RCTResponseSenderBlock) {
+    func addCardToUser(env : String, apiKey : String, mid : String, uid : String, firstName : String, lastName :String, email : String, phoneNumber : String, _ callback: @escaping RCTResponseSenderBlock) {
         count += 1
         print("count is \(count)")
         
         
-        let directpay:DPSDK = DPSDK(apiKey: "231e23e23e2e3", dpMerchantId: "TP00001", currency:DPSDK.CURRENCY.LKR, uniqueUserId: "USER_ID", userName: "USER NAME", mobile: "+94731234567", email: "emailifavailable@user.com")
+        let directpay:DPSDK = DPSDK(apiKey: apiKey, dpMerchantId: mid, currency:DPSDK.CURRENCY.LKR, uniqueUserId: uid, userName: firstName + " " + lastName, mobile:phoneNumber, email: email)
         DispatchQueue.main.async{
             let viewController =  UIApplication.shared.keyWindow!.rootViewController
             

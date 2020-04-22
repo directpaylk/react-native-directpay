@@ -8,7 +8,19 @@
 import Foundation
 
 internal class Constants{
-    private static let API = "https://dev.directpay.lk/v1/mpg/api/"
+    
+    // TODO: Make sure to DEBUG false before the release
+    static let DEBUG = false
+    
+    //    static let ENV = Constants.ENVIRONMENT.DEV
+    static let ENV = Constants.ENVIRONMENT.PROD
+    
+    internal struct ENVIRONMENT{
+        static let DEV = "dev"
+        static let PROD = "prod"
+    }
+    
+    private static let API = ENV == ENVIRONMENT.PROD ? "https://prod.directpay.lk/v1/mpg/api/" : "https://dev.directpay.lk/v1/mpg/api/"
     
     struct ROUTES {
         static let RETRIEVE_SESSION = Constants.API + "sdk/session"
@@ -16,12 +28,14 @@ internal class Constants{
         static let CARD_LIST = Constants.API + "sdk/cardList"
         static let CARD_DELETE = Constants.API + "sdk/cardDelete"
         static let CARD_PAY = Constants.API + "sdk/cardPay"
+        static let CHECK_3DS = Constants.API + "sdk/check3ds"
     }
     
     struct SDK {
         static var API_KEY = ""
         static var MERCHANT_ID = ""
         static let CONTENT_TYPE = "application/json"
+        static let THREE_D_S_AMOUNT = 5
     }
     
     struct KEYS {
@@ -45,6 +59,8 @@ internal class Constants{
         static let NUMBER = "number"
         static let STATUS = "status"
         static let SCHEDULED_ID = "scheduledId"
+        static let ACTION = "action"
+        static let PAYEE_ID = "payeeId"
     }
     
     struct ERROR {
@@ -75,6 +91,11 @@ internal class Constants{
         struct TOO_LARGE_RETRY_ATTEMPTS {
             static let CODE = "601"
             static let MESSAGE = "TOO_LARGE_RETRY_ATTEMPTS"
+        }
+        
+        struct CARD_NOT_ENROLLED_EXCEPTION {
+            static let CODE = "CardNotEnrolledException"
+            static let MESSAGE = "Card Not Enrolled Exception"
         }
     }
 }

@@ -58,7 +58,7 @@ open class DPSDK {
     
     open func addCard(_ viewController: UIViewController, success: @escaping (_ card:Any) ->(), error: @escaping (_ code:String, _ message:String) -> ()) {
         let cardModal = DPAddCardView(frame: viewController.view.bounds)
-        cardModal.setup(success, error)
+        cardModal.setup(success, error, viewController)
         viewController.view.addSubview(cardModal)
     }
     

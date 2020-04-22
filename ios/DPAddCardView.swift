@@ -7,9 +7,7 @@
 
 import UIKit
 
-@available(iOS 11.0, *)
 internal class DPAddCardView: UIView, UITextFieldDelegate {
-    var gateway:Gateway = Gateway(region: GatewayRegion.mtf, merchantId: "DPAYMID")
     let httpController:HttpController = HttpController()
     
     @IBOutlet private weak var textCardholderName: UITextField!
@@ -31,6 +29,9 @@ internal class DPAddCardView: UIView, UITextFieldDelegate {
     let nibName = "DPAddCardView"
     var contentView: UIView!
     
+    var gatewayId:String?
+    var check3ds:Bool?
+    
     internal override init(frame: CGRect) {
         super.init(frame: frame)
         self.setupView()
@@ -38,10 +39,12 @@ internal class DPAddCardView: UIView, UITextFieldDelegate {
     
     var successCallback: (_ card:Card) -> () = {_ in }
     var errorCallback: (_ code:String, _ message:String) -> () = {(_,_) in }
+    var viewController: UIViewController?
     
-    internal func setup(_ success: @escaping (_ card:Card) ->(), _ error: @escaping (_ code:String, _ message:String) ->()){
+    internal func setup(_ success: @escaping (_ card:Card) ->(), _ error: @escaping (_ code:String, _ message:String) ->(),_ viewController: UIViewController){
         self.successCallback = success
         self.errorCallback = error
+        self.viewController = viewController
     }
     
     internal override func layoutSubviews() {
@@ -61,12 +64,6 @@ internal class DPAddCardView: UIView, UITextFieldDelegate {
     }
     
     override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
-        //        print("performing action: \(action), \(sender)")
-        
-        //        if(action == "_share:"){
-        //            return false
-        //        }
-        
         return super.canPerformAction(action, withSender: sender)
     }
     
@@ -112,19 +109,16 @@ internal class DPAddCardView: UIView, UITextFieldDelegate {
     @IBAction func actionAddCard(_ sender: UIButton) {
         print("[DPSDK] - ADD CARD ACTION")
         self.dismissKeyboard()
-        
+
         if(self.validateFields()){
-            //TODO: REMOVE THIS
-            print("CARD DETAILS [\(textCardholderName.text!), \(textCardNumber.text!), \(textMonth.text!), \(textYear.text!), \(textCVV.text!))]")
-            
             self.showSpinner(onView: self)
-            
+
             self.name = textCardholderName.text
             self.number = textCardNumber.text
             self.month = textMonth.text
             self.year = textYear.text
             self.securityCode = textCVV.text
-            
+
             self.getSession()
         }
     }
@@ -139,21 +133,26 @@ internal class DPAddCardView: UIView, UITextFieldDelegate {
     
     @objc func getSession() {
         httpController.post(proccessed: true,url: Constants.ROUTES.RETRIEVE_SESSION, parameters: nil, success:  { (data: NSDictionary) in
-            print("[DATA] : \(data)")
+             if(Constants.DEBUG == true){print("[DATA] : \(data)")}
             
             if let session:[String:Any] = data["session"] as? [String : Any]{
                 self.sessionId = session["id"] as? String
                 
-                print("[DPSDK] - SESSION ID:\(self.sessionId!)")
+                 if(Constants.DEBUG == true){print("[DPSDK] - SESSION ID:\(self.sessionId!)")}
                 let merchant:[String:Any]? = data["merchant"] as? [String : Any]
                 let apiVersion:String? = data["apiVersion"] as? String
                 
+                
                 if(merchant != nil && apiVersion != nil){
+                    self.apiVersion = apiVersion
+                    self.gatewayId = merchant!["gid"] as? String
+                    self.check3ds = merchant!["isEnable3ds"] as? Bool
+
                     self.updateSession()
                 }
             }
         }, handleError: {(error: String, message:String) in
-            print("[DPSDK] - GET SESSION ERROR: " + message)
+             if(Constants.DEBUG == true){print("[DPSDK] - GET SESSION ERROR: " + message)}
             self.showRetryWithWarnings(warning: "Service unavailable!.", UITapGestureRecognizer(target: self, action: #selector(self.resetFields)))
         })
     }
@@ -168,20 +167,54 @@ internal class DPAddCardView: UIView, UITextFieldDelegate {
             request[at: "sourceOfFunds.provided.card.expiry.month"] = self.month
             request[at: "sourceOfFunds.provided.card.expiry.year"] = self.year
             
+            let gateway:Gateway = Gateway(
+                region: Constants.ENV == Constants.ENVIRONMENT.PROD ? GatewayRegion.asiaPacific : GatewayRegion.mtf,
+                merchantId: self.gatewayId!
+            )
+            
             gateway.updateSession(self.sessionId!, apiVersion: self.apiVersion!, payload: request) { (result: GatewayResult<GatewayMap>) in
-                print(result)
+                 if(Constants.DEBUG == true){print(result)}
                 switch result {
                 case .success(let response):
-                    print("[DPSDK] _MP_RESPONSE", response.description)
-                    self.addCard()
+                     if(Constants.DEBUG == true){print("[DPSDK] _MP_RESPONSE", response.description)}
+                     if(self.check3ds!){
+                        self.check3dsStatus()
+                     }else{
+                        self.addCard()
+                     }
                 case .error(let error):
-                    print(error)
+                     if(Constants.DEBUG == true){print(error)}
                     self.showRetryWithWarnings(warning: "Sorry! Service is unavailable!", UITapGestureRecognizer(target: self, action: #selector(self.resetFields)))
                 }
             }
         }else{
             self.removeSpinner()
         }
+    }
+    
+    func check3dsStatus() {
+        if(Constants.DEBUG) {print("CHECKING_3DS")}
+        
+        let parameters:Dictionary = [
+            "merchantId" : Constants.SDK.MERCHANT_ID,
+            "_sessionId": self.sessionId!,
+            "amount":  Constants.SDK.THREE_D_S_AMOUNT,
+            ] as [String : Any]
+        
+        httpController.post(proccessed:true, url: Constants.ROUTES.CHECK_3DS, parameters: parameters, success: { (data:NSDictionary) in
+            if let html:String = data.value(forKey: "html") as? String {
+                DispatchQueue.main.async {
+                    self.begin3DSAuth(simple: html)
+                }
+            }
+        }, handleError: { (error:String, message:String) in
+            if(Constants.DEBUG == true){print("[DPSDK] - ADD CARD ERROR: " + message)}
+            if(error == Constants.ERROR.CARD_NOT_ENROLLED_EXCEPTION.CODE){
+                self.addCard()
+            }else{
+                self.showRetryWithWarnings(warning:  message, UITapGestureRecognizer(target: self, action: #selector(self.resetFields)))
+            }
+        })
     }
     
     func addCard() {
@@ -208,7 +241,7 @@ internal class DPAddCardView: UIView, UITextFieldDelegate {
             }
             
         }, handleError: { (error:String, message:String) in
-            print("[DPSDK] - ADD CARD ERROR: " + message)
+             if(Constants.DEBUG == true){print("[DPSDK] - ADD CARD ERROR: " + message)}
             self.showRetryWithWarnings(warning:  message, UITapGestureRecognizer(target: self, action: #selector(self.resetFields)))
         })
     }
@@ -252,7 +285,7 @@ internal class DPAddCardView: UIView, UITextFieldDelegate {
             return false
         }
         
-        if((textCardNumber.text?.count)! < 13 || (textCardNumber.text?.count)! > 19){
+        if((textCardNumber.text?.count)! < 12 || (textCardNumber.text?.count)! > 19){
             self.showWarning(component:textCardNumber, warning: "Invalid credit card number.")
             return false
         }
@@ -286,16 +319,11 @@ internal class DPAddCardView: UIView, UITextFieldDelegate {
         
         let year:Int = Int("20" + textYear.text!)!
         let currentYear = Calendar.current.component(.year, from: Date())
-        
-        if(year < currentYear){
-            //            self.showWarning(component:textYear, warning: "This card is expired!")
-            self.showWarning(component:textMonth, warning: "This card is expired!")
-            return false
-        }
-        
         let currentMonth = Calendar.current.component(.month, from: Date())
         
-        if(month < currentMonth){
+        if(Constants.DEBUG == true){print("YEAR: \(year), CURRENT_YEAR: \(currentYear)", "MONTH: \(month), CURRENT_MONTH: \(currentMonth)")}
+        
+        if(year < currentYear && month < currentMonth){
             self.showWarning(component:textMonth, warning: "This card is expired!")
             return false
         }
@@ -306,6 +334,45 @@ internal class DPAddCardView: UIView, UITextFieldDelegate {
         }
         
         return true
+    }
+    
+    let brandColor = UIColor.blue
+    
+    fileprivate func begin3DSAuth(simple: String) {
+        // instatniate the Gateway 3DSecureViewController and present it
+        let threeDSecureView = Gateway3DSecureViewController(nibName: nil, bundle: nil)
+        viewController?.present(threeDSecureView, animated: true)
+        
+        // Optionally customize the presentation
+        threeDSecureView.title = "3-D Secure Auth"
+        threeDSecureView.navBar.tintColor = brandColor
+        
+        // Start 3D Secure authentication by providing the view with the HTML content provided by the check enrollment step
+        threeDSecureView.authenticatePayer(htmlBodyContent: simple, handler: handle3DS(authView:result:))
+    }
+    
+    func handle3DS(authView: Gateway3DSecureViewController, result: Gateway3DSecureResult) {
+        // dismiss the 3DSecureViewController
+        authView.dismiss(animated: true, completion: {
+            print("3DS_RESULT: ", result)
+            switch result {
+            case .error(_):
+                self.showRetryWithWarnings(warning:  "3DS Authentication Failed", UITapGestureRecognizer(target: self, action: #selector(self.resetFields)))
+            case .completed(gatewayResult: let response):
+
+                // check for version 46 and earlier api authentication failures and then version 47+ failures
+                if Int(self.apiVersion!)! <= 46, let status = response[at: "3DSecure.summaryStatus"] as? String , status == "AUTHENTICATION_FAILED" {
+                    self.showRetryWithWarnings(warning:  "3DS Authentication Failed", UITapGestureRecognizer(target: self, action: #selector(self.resetFields)))
+
+                } else if let status = response[at: "response.gatewayRecommendation"] as? String, status == "DO_NOT_PROCEED"  {
+                    self.showRetryWithWarnings(warning:  "3DS Authentication Failed", UITapGestureRecognizer(target: self, action: #selector(self.resetFields)))
+                } else {
+                    self.addCard()
+                }
+            default:
+                self.showRetryWithWarnings(warning:  "3DS Authentication Cancelled", UITapGestureRecognizer(target: self, action: #selector(self.resetFields)))
+            }
+        })
     }
     
     func showWarning(component: UIView, warning: String, level:WarningLevel = .error) {
@@ -335,7 +402,7 @@ internal class DPAddCardView: UIView, UITextFieldDelegate {
         if let keyboardFrame: NSValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue {
             let keyboardRectangle = keyboardFrame.cgRectValue
             let keyboardHeight = keyboardRectangle.height
-            print("[DPSDK] KEYBOARD HEIGHT",keyboardHeight)
+             if(Constants.DEBUG == true){print("[DPSDK] KEYBOARD HEIGHT",keyboardHeight)}
             self.slideForKeyboard("up")
         }
     }
@@ -346,28 +413,7 @@ internal class DPAddCardView: UIView, UITextFieldDelegate {
     }
     
     private func setupView(){
-        
-        //        if let bundlePath = Bundle.main.path(forResource: "Resources", ofType: "bundle"),
-        //            let bundle = Bundle(path: bundlePath),
-        //            let path = bundle.path(forResource: "DPAddCardView", ofType: ".cib") {
-        //            print(path)
-        
-        let myBundle = Bundle(for: type(of: self))
-        
-        // Get the URL to the resource bundle within the bundle
-        // of the current class.
-        guard let resourceBundleURL = myBundle.url(
-            forResource: "Resources", withExtension: "bundle")
-            else { fatalError("Resources not found!") }
-        
-        // Create a bundle object for the bundle found at that URL.
-        guard let bundle = Bundle(url: resourceBundleURL)
-            else { fatalError("Cannot access Resources!") }
-        
-        
-        
-        
-        // let bundle = Bundle(for: type(of: self))
+        let bundle = Bundle(for: type(of: self))
         let nib = UINib(nibName: self.nibName, bundle: bundle)
         self.contentView = nib.instantiate(withOwner: self, options: nil).first as? UIView
         addSubview(contentView)
@@ -375,10 +421,9 @@ internal class DPAddCardView: UIView, UITextFieldDelegate {
         contentView.center = self.center
         contentView.autoresizingMask = []
         contentView.translatesAutoresizingMaskIntoConstraints = true
-        //        contentView.layer.cornerRadius = 5
+//        contentView.layer.cornerRadius = 5
         contentView.layer.borderWidth = 2
         contentView.layer.borderColor = UIColor(red:0.00, green:0.13, blue:0.48, alpha:1.0).cgColor
-        
         
         self.textCardholderName.text = ""
         self.textCardNumber.text = ""
@@ -403,11 +448,6 @@ internal class DPAddCardView: UIView, UITextFieldDelegate {
         
         self.contentView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.dismissKeyboard)))
         self.removeSpinner()
-        
-        //        } else {
-        //            print("not found")
-        //
-        //        }
     }
 }
 
@@ -434,7 +474,7 @@ extension UIView{
                         vSpinner?.backgroundColor = UIColor(red:0.37, green:0.37, blue:0.37, alpha:1.0)
                         break
                     }
-                    
+                
                 }, completion: { (completed:Bool) in
                     let bounds:CGRect = (vSpinner?.bounds)!
                     
@@ -471,7 +511,7 @@ extension UIView{
         if(vSpinner != nil){
             DispatchQueue.main.async {
                 vSpinner?.endEditing(true)
-                
+
                 UIView.animate(withDuration: 0.20, animations: {
                     vSpinner?.backgroundColor = UIColor(red:0.37, green:0.70, blue:0.26, alpha:1.0)
                 }, completion: { (completed:Bool) in
@@ -492,7 +532,7 @@ extension UIView{
                     labelMessage.font = UIFont(name: "System Bold", size: 15)
                     
                     let imageSuccess:UIImageView = UIImageView(image: UIImage(named: "success"))
-                    //                    imageSuccess.contentMode = .scaleAspectFit
+//                    imageSuccess.contentMode = .scaleAspectFit
                     imageSuccess.frame = CGRect(x: 0, y: 0, width: 150, height: 150)
                     
                     for view:UIView in (vSpinner?.subviews)! {
@@ -500,7 +540,7 @@ extension UIView{
                     }
                     vSpinner?.addSubview(buttonDone)
                     vSpinner?.addSubview(labelMessage)
-                    //                    vSpinner?.addSubview(imageSuccess)
+//                    vSpinner?.addSubview(imageSuccess)
                 })
             }
         }
