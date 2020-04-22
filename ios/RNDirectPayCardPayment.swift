@@ -17,11 +17,20 @@ class RNDirectPayCardPayment: NSObject {
         return true
     }
     
-    private var count = 0
+
     @objc
-    func addCardToUser(env : String, apiKey : String, mid : String, uid : String, firstName : String, lastName :String, email : String, phoneNumber : String, _ callback: @escaping RCTResponseSenderBlock) {
-        count += 1
-        print("count is \(count)")
+    func addCardToUser(_ env : String, apiKey : String, mid : String, uid : String, firstName : String, lastName :String, email : String, phoneNumber : String,  callback: @escaping RCTResponseSenderBlock) {
+     
+        if(env == "dev"){
+            Constants.DEBUG = true
+            Constants.API = Constants.DEV_URL
+            Constants.ENV = Constants.ENVIRONMENT.DEV
+        }
+        else{
+            Constants.DEBUG = false
+            Constants.API = Constants.PROD_URL
+            Constants.ENV = Constants.ENVIRONMENT.PROD
+        }
         
         
         let directpay:DPSDK = DPSDK(apiKey: apiKey, dpMerchantId: mid, currency:DPSDK.CURRENCY.LKR, uniqueUserId: uid, userName: firstName + " " + lastName, mobile:phoneNumber, email: email)

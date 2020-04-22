@@ -10,17 +10,19 @@ import Foundation
 internal class Constants{
     
     // TODO: Make sure to DEBUG false before the release
-    static let DEBUG = false
+    static var DEBUG = true
     
-    //    static let ENV = Constants.ENVIRONMENT.DEV
-    static let ENV = Constants.ENVIRONMENT.PROD
+    static var ENV = Constants.ENVIRONMENT.DEV
     
     internal struct ENVIRONMENT{
         static let DEV = "dev"
         static let PROD = "prod"
     }
     
-    private static let API = ENV == ENVIRONMENT.PROD ? "https://prod.directpay.lk/v1/mpg/api/" : "https://dev.directpay.lk/v1/mpg/api/"
+    public static let DEV_URL = "https://dev.directpay.lk/v1/mpg/api/"
+    public static let PROD_URL = "https://prod.directpay.lk/v1/mpg/api/"
+    
+    public static var API  = DEV_URL
     
     struct ROUTES {
         static let RETRIEVE_SESSION = Constants.API + "sdk/session"

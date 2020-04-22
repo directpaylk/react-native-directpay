@@ -27,7 +27,7 @@ internal class HttpController {
             do{
                 let jsonData = try JSONSerialization.data(withJSONObject: parameters!, options: [])
                 let jsonString = String(data: jsonData, encoding: String.Encoding.ascii)!
-                print ("[DPSK] - HTTP_REQUEST: ", jsonString)
+                if(Constants.DEBUG == true){print ("[DPSK] - HTTP_REQUEST: ", jsonString)}
                 rawData = jsonString
                 request.httpBody = jsonData
             }catch{}
@@ -35,7 +35,7 @@ internal class HttpController {
         
         let digest = DPDigest.encode(rawData ?? nil)
         
-        print("[DPSDK] - DIGEST: \(digest)")
+        if(Constants.DEBUG == true){print("[DPSDK] - DIGEST: \(digest)")}
         
         //COMPULSORY HEADER
         request.addValue(Constants.SDK.CONTENT_TYPE, forHTTPHeaderField: HttpController.contentType)
@@ -43,12 +43,15 @@ internal class HttpController {
         request.addValue(Constants.SDK.MERCHANT_ID, forHTTPHeaderField: HttpController.directpayMerchant)
         request.addValue(digest, forHTTPHeaderField: HttpController.digest)
         
-        
+        if(Constants.DEBUG == true){
+            print("[DPSDK] REQUEST: ", request)
+        }
         let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
             if let data = data {
                 do {
-                    print("[DPSDK] HTTP RESPONSE: \(data)")
-                    
+                    if(response != nil && Constants.DEBUG == true){
+                        print("[DPSDK] HTTP_RESPONSE: ", response!)
+                    }
                     let jsonSerialized = try JSONSerialization.jsonObject(with: data, options: []) as? [String : Any]
                     if jsonSerialized != nil{
                         completion(jsonSerialized!, response!)
@@ -56,11 +59,11 @@ internal class HttpController {
                         completion([:], response!)
                     }
                 }  catch let error as NSError {
-                    print(error.localizedDescription)
+                    if(Constants.DEBUG == true){print(error.localizedDescription)}
                     handleError(error)
                 }
             } else if let error = error {
-                print(error.localizedDescription)
+                if(Constants.DEBUG == true){print(error.localizedDescription)}
                 handleError(error)
             }
         }
@@ -68,39 +71,48 @@ internal class HttpController {
         task.resume()
     }
     
-    @available(iOS 11.0, *)
     func post(proccessed:Bool,url:String,parameters:[String:Any]?, success:  @escaping (_ data: NSDictionary)->(), handleError: @escaping (_ code:String,_ message:String)->()){
         self.post(url: url, parameters: parameters, completion:{(responseJson:[String:Any], response:URLResponse) in
             if let status:Int = responseJson["status"] as? Int {
                 let data:NSDictionary = responseJson["data"] as! NSDictionary
-                
                 if(status == 200){
-                    print("[DPSDK] STATUS : 200")
+                    if(Constants.DEBUG == true){print("[DPSDK] STATUS : 200")}
                     if let httpResponse = response as? HTTPURLResponse {
                         if let serverDigest = httpResponse.allHeaderFields["Digest"] as? String {
-                            print("[DATA JSON] : \(data)")
+                            if(Constants.DEBUG == true){print("[DATA JSON] : \(data)")}
                             do{
-                                let jsonData = try JSONSerialization.data(withJSONObject: data, options: .sortedKeys)
-                                let digest = DPDigest.encode(String(data: jsonData, encoding: String.Encoding.utf8))
-                                print("[DIGEST] - FROM RESPONSE: ", serverDigest, "LOCAL_DIGEST: \(digest)")
+                                var jsonData:Data? = nil
+                                if #available(iOS 11.0, *) {
+                                    jsonData = try JSONSerialization.data(withJSONObject: data, options: .sortedKeys)
+                                } else {
+                                    success(data)
+                                    return
+                                }
+                                
+                                let digest = DPDigest.encode(String(data: jsonData!, encoding: .utf8))
+                                if(Constants.DEBUG == true){print("[DIGEST] - FROM RESPONSE: ", serverDigest, "LOCAL_DIGEST: \(digest)")}
                                 
                                 if(digest == serverDigest){
-                                    print("[_DIGEST] MATCHED")
+                                    if(Constants.DEBUG == true){print("[_DIGEST] MATCHED")}
                                     success(data)
                                 }else{
-                                    print("[_DIGEST] NOT MATCHED")
-                                    handleError(Constants.ERROR.DIGEST_NOT_MATCHED.CODE, Constants.ERROR.DIGEST_NOT_MATCHED.MESSAGE)
+                                    if(Constants.DEBUG == true){print("[_DIGEST] NOT MATCHED")}
+                                    handleError(aConstants.ERROR.DIGEST_NOT_MATCHED.CODE, Constants.ERROR.DIGEST_NOT_MATCHED.MESSAGE)
                                 }
                             }catch {
                                 handleError(Constants.ERROR.CANNOT_PROCESS.CODE, Constants.ERROR.CANNOT_PROCESS.MESSAGE)
                             }
                         }else{
+                            if(url.split(separator: "/").last == "check3ds"){
+                                success(data)
+                                return
+                            }
                             handleError(Constants.ERROR.DIGEST_NOT_FOUND.CODE, Constants.ERROR.DIGEST_NOT_FOUND.MESSAGE)
                         }
                     }
                 }else if(status == 400){
                     let message = data.value(forKey: "message") as! String
-                    let errorCode = data.value(forKey: "error") as! String
+                    let errorCode = (data.value(forKey: "error") ?? data.value(forKey: "code")) as! String
                     
                     handleError(errorCode, message)
                 }else{
@@ -108,9 +120,8 @@ internal class HttpController {
                 }
             }
         }, handleError: { (nserror:Error) in
-            print("[DPSDK] - ERROR:", nserror.localizedDescription)
+            if(Constants.DEBUG == true){print("[DPSDK] - ERROR:", nserror.localizedDescription)}
             handleError(Constants.ERROR.SERVICE_UNAVAILABLE.CODE, Constants.ERROR.SERVICE_UNAVAILABLE.MESSAGE)
         })
     }
-    
 }
