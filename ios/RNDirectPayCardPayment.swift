@@ -47,11 +47,9 @@ class RNDirectPayCardPayment: NSObject {
                     
                     ] as [String : Any];
                 
-                print("[NEW CARD ADDED] SUCCESS - CARD_DETAILS: ", card)
                 callback([NSNull(),resultsDict])
             }, error: {(code:String, message:String) in
-                print("[NEW CARD ADDED] ERROR: CODE - ",code, "MESSAGE - ", message)
-                
+
                 let errorDict = [
                     "code":code,
                     "message":message

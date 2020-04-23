@@ -413,7 +413,18 @@ internal class DPAddCardView: UIView, UITextFieldDelegate {
     }
     
     private func setupView(){
-        let bundle = Bundle(for: type(of: self))
+
+        let myBundle = Bundle(for: type(of: self))	
+        // Get the URL to the resource bundle within the bundle	
+        // of the current class.	
+        guard let resourceBundleURL = myBundle.url(	
+            forResource: "Resources", withExtension: "bundle")	
+            else { fatalError("Resources not found!") }	
+
+        // Create a bundle object for the bundle found at that URL.	
+        guard let bundle = Bundle(url: resourceBundleURL)	
+            else { fatalError("Cannot access Resources!") }
+            
         let nib = UINib(nibName: self.nibName, bundle: bundle)
         self.contentView = nib.instantiate(withOwner: self, options: nil).first as? UIView
         addSubview(contentView)
