@@ -47,6 +47,27 @@
 import RNDirectPayCardPayment from 'react-native-direct-pay-card-payment';
 
 // TODO: What to do with the module?
-RNDirectPayCardPayment;
+RNDirectPayCardPayment.addCardToUser(
+                'dev', //env : dev or prod
+                'e0e2c6e150775dff22e143af7ba234424', // apiKey
+                'FN02385', // mid
+                '8c1eeae8-07cb-4c7b-12334422e4q3', //unique id of the user
+                'Jhon', // firstname of the user
+                'Doe', // lastname of the user
+                'jhon@mail.com', // email of the user
+                '0712100113', // phone number of the user
+                (_err, _r) => {
+                  if (_err) {
+                    console.log('code: ' + _err.code);
+                    console.log('message: ' + _err.message);
+                  } else {
+                    //successfully added the card
+                    console.log('id: ' + _r.id); // id (token) of the added card
+                    console.log('mask: ' + _r.mask); // masked card number
+                    console.log('reference: ' + _r.reference); // unique user id as the reference
+                    console.log('brand: ' + _r.brand); // brand of the card (Visa / Mastercared)
+                  }
+                },
+              );;
 ```
   
