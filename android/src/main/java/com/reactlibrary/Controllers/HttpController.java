@@ -35,11 +35,13 @@ public class HttpController {
             String my_url = params[1].toString();
             String my_data = params[2].toString();
             String digest = params[3].toString();
-            final HttpCallback callback = (HttpCallback) params[4];
+            HttpCallback callback = (HttpCallback) params[4];
 
-            Log.d(TAG, "doInBackground: URL: " + my_url + ", DATA: " + my_data + ", DIGEST: " + digest);
+            if (Constants.debug)
+                Log.d(TAG, "doInBackground: URL: " + my_url + ", DATA: " + my_data + ", DIGEST: " + digest);
 
-            Log.d(TAG, "doInBackground: DIGEST:" + digest);
+            if (Constants.debug) Log.d(TAG, "doInBackground: DIGEST:" + digest);
+
             try {
                 URL url = new URL(my_url);
                 HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
@@ -65,9 +67,11 @@ public class HttpController {
                     outputStreamWriter.close();
 
                     // to log the response code of your request
-                    Log.d(TAG, "MyHttpRequestTask doInBackground : " + httpURLConnection.getResponseCode());
+                    if (Constants.debug)
+                        Log.d(TAG, "MyHttpRequestTask doInBackground : " + httpURLConnection.getResponseCode());
                     // to log the response message from your server after you have tried the request.
-                    Log.d(TAG, "MyHttpRequestTask doInBackground [MESSAGE]: " + httpURLConnection.getResponseMessage());
+                    if (Constants.debug)
+                        Log.d(TAG, "MyHttpRequestTask doInBackground [MESSAGE]: " + httpURLConnection.getResponseMessage());
                     InputStream inputStream;
 
                     if (httpURLConnection.getResponseCode() == Constants.HTTP_CODE.OK.CODE) {
@@ -82,44 +86,54 @@ public class HttpController {
                     while ((line = br.readLine()) != null) {
                         response.append(line);
                     }
-                    Log.i(TAG, "doInBackground: RESPONSE: " + response.toString());
+                    if (Constants.debug)
+                        Log.i(TAG, "doInBackground: RESPONSE: " + response.toString());
                     JSONObject jsonResponse = new JSONObject(response.toString());
 
                     if (jsonResponse.has("status")) {
                         int status = jsonResponse.getInt("status");
-                        final JSONObject data = jsonResponse.getJSONObject("data");
+                        JSONObject data = jsonResponse.getJSONObject("data");
 
                         if (status == Constants.HTTP_CODE.OK.CODE) {
                             String serverDigest = httpURLConnection.getHeaderField(Constants.HEADERS.DIGEST.KEY);
-                            String sdkDigest = DPDigest.encode(data.toString());
-                            if (serverDigest.equals(sdkDigest)) {
-                                activity.runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        callback.success(data);
-                                    }
-                                });
-                                return null;
-                            } else {
-                                final Constants.ERRORS error = Constants.ERRORS.INVALID_SERVER_RESPONSE;
-                                activity.runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        callback.error(error.CODE, error.MESSAGE);
-                                    }
-                                });
-
+                            if (serverDigest == null) {
+                                activity.runOnUiThread(() -> callback.success(data));
                                 return null;
                             }
+//                            String sdkDigest = DPDigest.encode(data.toString());
+//                            if (serverDigest.equals(sdkDigest)) {
+                            activity.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    callback.success(data);
+                                }
+                            });
+                            return null;
+//                            } else {
+//                                Constants.ERRORS error = Constants.ERRORS.INVALID_SERVER_RESPONSE;
+//                                activity.runOnUiThread(new Runnable() {
+//                                    @Override
+//                                    public void run() {
+//                                        callback.error(error.CODE, error.MESSAGE);
+//                                    }
+//                                });
+//
+//                                return null;
+//                            }
                         } else if (status == Constants.HTTP_CODE.BAD_REQUEST.CODE) {
-//                            String code = data.getString("error");
-                            final String message = data.getString("message");
+                            String code = data.has("error") ? data.getString("error") : data.getString("code");
+                            String message = data.getString("message");
 
                             activity.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    Constants.ERRORS error = Constants.ERRORS.CANNOT_PROCESS;
-                                    callback.error(error.CODE, message);
+                                    if (Constants.CARD_NOT_ENROLLED_EXCEPTION.equals(code)) {
+                                        Constants.ERRORS error = Constants.ERRORS.CARD_NOT_ENROLLED_EXCEPTION;
+                                        callback.error(error.CODE, message);
+                                    } else {
+                                        Constants.ERRORS error = Constants.ERRORS.CANNOT_PROCESS;
+                                        callback.error(error.CODE, message);
+                                    }
                                 }
                             });
 

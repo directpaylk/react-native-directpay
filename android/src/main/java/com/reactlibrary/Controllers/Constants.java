@@ -1,17 +1,23 @@
 package com.reactlibrary.Controllers;
 
 public class Constants {
-
-    public static String ENV = "dev";
-
-    public static boolean debug = false;
-
+    public static String LOC = "loc";
     public static String DEV = "dev";
     public static String PROD = "prod";
+
+    //TODO: set debug false before the release build.
+    public final static boolean debug = false;
+
+    //Defines sdk environment
+
+    //    public final static String ENV = LOC;
+//    public final static String ENV = DEV;
+    public static String ENV = DEV;
 
     public static String API_KEY;
     public static String MERCHANT_ID;
     public static String API_VERSION;
+    public static String CARD_NOT_ENROLLED_EXCEPTION = "CardNotEnrolledException";
 
     public enum ERRORS {
         CANNOT_VERIFY_THE_REQUEST(567, "CANNOT_VERIFY_THE_REQUEST"),
@@ -34,24 +40,22 @@ public class Constants {
     }
 
     public enum RESPONSES {
-        AUTHENTICATION_SUCCESSFUL ("AUTHENTICATION_SUCCESSFUL");
+        AUTHENTICATION_SUCCESSFUL("AUTHENTICATION_SUCCESSFUL"),
+        AUTHENTICATION_ATTEMPTED("AUTHENTICATION_ATTEMPTED");
 
         public String CODE;
 
-        private RESPONSES(String response){
+        private RESPONSES(String response) {
             this.CODE = response;
         }
     }
 
-    public static String DEV_URL = "https://dev.directpay.lk/v1/mpg/api";
-    public static String PROD_URL = "https://prod.directpay.lk/v1/mpg/api";
-    public static String API;
-
     public enum ROUTES {
-        GET_SESSION("/sdk/session"), ADD_CARD("/sdk/cardAdd"), LIST_CARD("/sdk/cardList"), REMOVE_CARD("/sdk/cardDelete"), PAY_CARD("/sdk/cardPay"),CHECK_3DS("/sdk/check3ds");
+        GET_SESSION("/sdk/session"), ADD_CARD("/sdk/cardAdd"), LIST_CARD("/sdk/cardList"), REMOVE_CARD("/sdk/cardDelete"), PAY_CARD("/sdk/cardPay"), CHECK_3DS("/sdk/check3ds");
         public String URL;
 
         private ROUTES(String namespace) {
+            String API = ENV.equals(PROD) ? "https://prod.directpay.lk/v1/mpg/api" : ENV.equals(DEV) ? "https://dev.directpay.lk/v1/mpg/api" : "http://172.168.1.20/mastercardapi/public/api";
             this.URL = API + namespace;
         }
     }
