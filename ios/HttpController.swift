@@ -97,7 +97,7 @@ internal class HttpController {
                                     success(data)
                                 }else{
                                     if(Constants.DEBUG == true){print("[_DIGEST] NOT MATCHED")}
-                                    handleError(aConstants.ERROR.DIGEST_NOT_MATCHED.CODE, Constants.ERROR.DIGEST_NOT_MATCHED.MESSAGE)
+                                    handleError(Constants.ERROR.DIGEST_NOT_MATCHED.CODE, Constants.ERROR.DIGEST_NOT_MATCHED.MESSAGE)
                                 }
                             }catch {
                                 handleError(Constants.ERROR.CANNOT_PROCESS.CODE, Constants.ERROR.CANNOT_PROCESS.MESSAGE)
