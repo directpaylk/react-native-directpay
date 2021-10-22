@@ -55,7 +55,7 @@ RNDirectPayCardPayment.addCardToUser(
                 'Jhon', // firstname of the user
                 'Doe', // lastname of the user
                 'jhon@mail.com', // email of the user
-                '0712100113', // phone number of the user
+                '0730000001', // phone number of the user
                 (_err, _r) => {
                   if (_err) {
                     console.log('code: ' + _err.code);
